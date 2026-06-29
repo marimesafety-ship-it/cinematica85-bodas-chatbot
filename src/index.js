@@ -96,6 +96,10 @@ export default {
             messages: historial,
           }),
         });
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          throw new Error('Anthropic API ' + resp.status + ': ' + errorText);
+        }
         const data = await resp.json();
         return new Response(
           JSON.stringify({ respuesta: data.content[0].text }),
@@ -103,7 +107,7 @@ export default {
         );
       } catch (err) {
         return new Response(
-          JSON.stringify({ error: 'Error al conectar con Claude' }),
+          JSON.stringify({ error: 'Error al conectar con Claude', debug: err.message }),
           { status: 500, headers: { 'content-type': 'application/json', ...corsHeaders() } }
         );
       }
